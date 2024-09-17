@@ -1,0 +1,104 @@
+```{r}
+library(tidyverse) # install.packages("tidyverse")
+library(ggplot2) # install.packages("ggplot2")
+library(skimr) # install.packages("skimr")
+# library(ggpairs) # install.packages("ggpairs")
+```
+```{r}
+# read in LusitaniaManifest.csv
+lusitania <- read_csv("LusitaniaManifest.csv")
+```
+```{r}
+skim(lusitania)
+```
+
+```{r}
+colnames(lusitania)
+```
+"Family name"      "Title"            "Personal name"    "Fate"             "Age"
+[7] "Department/Class" "Passenger/Crew"   "Citizenship"      "Position"         "Status"           "City"
+[13] "Lifeboat"         "Rescue Vessel"    "Adult/Minor"      "Sex"
+
+```{r}
+head(lusitania)
+```
+```{r}
+# make Fate, Passenger/Crew, Citizenship, Position, Status, Adult/Minor, and Sex into factors
+lusitania <- lusitania %>%
+  mutate(Fate = as.factor(Fate),
+         'Passenger/Crew' = as.factor('Passenger/Crew'),
+         Citizenship = as.factor(Citizenship),
+         Position = as.factor(Position),
+         Status = as.factor(Status),
+         "Adult/Minor" = as.factor("Adult/Minor"),
+         Sex = as.factor(Sex))
+```
+```{r}
+# plot of Fate
+ggplot(lusitania, aes(x = Fate)) +
+  geom_bar() +
+  labs(title = "Fate of Passengers and Crew on the Lusitania",
+       x = "Fate",
+       y = "Count")
+```
+```{r}
+# plot of Passenger/Crew color by Fate
+ggplot(lusitania, aes(x = 'Passenger/Crew', fill = Fate)) +
+  geom_bar() +
+  labs(title = "Fate of Passengers and Crew on the Lusitania",
+       x = "Passenger/Crew",
+       y = "Count")
+```
+```{r}
+# plot of Citizenship color by Passenger/Crew
+ggplot(lusitania, aes(x = Citizenship, fill = 'Passenger/Crew')) +
+  geom_bar() +
+  labs(title = "Citizenship of Passengers and Crew on the Lusitania",
+       x = "Citizenship",
+       y = "Count") + # rotate x-axis labels
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+```{r}
+# plot of the top 5 Positions, drop NA
+lusitania %>%
+  filter(!is.na(Position)) %>%
+  count(Position, sort = TRUE) %>%
+  head(5) %>%
+  ggplot(aes(x = reorder(Position, n), y = n)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 5 Positions on the Lusitania",
+       x = "Position",
+       y = "Count")
+```
+```{r}
+# plot a hist of Age
+ggplot(lusitania, aes(x = Age)) +
+  geom_histogram(binwidth = 5) +
+  labs(title = "Age of Passengers and Crew on the Lusitania",
+       x = "Age",
+       y = "Count")
+```
+```{r}
+# color the hist of Age by Fate
+ggplot(lusitania, aes(x = Age, fill = Fate)) +
+  geom_histogram(binwidth = 5) +
+  labs(title = "Age of Passengers and Crew on the Lusitania",
+       x = "Age",
+       y = "Count")
+```
+```{r}
+# plot age by sex
+ggplot(lusitania, aes(x = Age, fill = Sex)) +
+  geom_histogram(binwidth = 5) +
+  labs(title = "Age of Passengers and Crew on the Lusitania",
+       x = "Age",
+       y = "Count")
+```
+```{r}
+# plot sex by fate
+ggplot(lusitania, aes(x = Sex, fill = Fate)) +
+  geom_bar() +
+  labs(title = "Sex of Passengers and Crew on the Lusitania",
+       x = "Sex",
+         y = "Count")
+```
